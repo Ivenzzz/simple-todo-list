@@ -3,7 +3,7 @@ const addTaskBtn = document.querySelector('#addTaskBtn');
 const taskList = document.querySelector('#taskList');
 const emptyWarningMessage = document.querySelector('#emptyWarning');
 
-const tasks = [];
+const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
 // Generate list element from tasks array of objects
 const renderTask = () => {
@@ -18,7 +18,7 @@ const renderTask = () => {
         emptyWarningMessage.classList.add('hidden');
     }
 
-    tasks.forEach(task => {
+    tasks.slice().reverse().forEach(task => {
         const li = document.createElement('li');
         li.textContent = task.name;
         li.setAttribute('id', `task${task.id}`);
@@ -61,6 +61,7 @@ addTaskBtn.addEventListener('click', () => {
     const taskInputValue = inputTask.value;
     if(taskInputValue === '') return;
     tasks.push({ id: Date.now(), name: `${taskInputValue}`, completed: false});
+    saveTask();
     inputTask.value = '';
     renderTask();
     console.log(tasks);
@@ -79,6 +80,7 @@ const clearTaskList = () => {
 const toggleCompletedTask = (taskId) => {
     const task = tasks.find(t => t.id === taskId);
     task.completed = !task.completed;
+    saveTask();
     renderTask();
 }
 
@@ -87,8 +89,13 @@ const deleteTask = (taskId) => {
     const taskIndex = tasks.findIndex(t => t.id === taskId);
     if(taskIndex !== -1) {
         tasks.splice(taskIndex, 1);
+        saveTask();
         renderTask();
     }
+}
+
+const saveTask = () => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 
